@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Night Shift: junior security team</title>
+<meta name="description" content="Interactive cybersecurity training for teens: passwords, phishing, least privilege and ethical hacking.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#F2F3FB; --surface:#FFFFFF; --surface2:#E6E8F6; --text:#161A3A; --muted:#4F5586; --line:#C9CEEA;
+  --accent:#FFB547; --accent-ink:#2A1B00; --accent-text:#8A4F00;
+  --safe:#0B7A55; --safe-bg:#DDF5EC; --danger:#BE2237; --danger-bg:#FBE3E6; --info:#0B64A0; --info-bg:#DDEEFA;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#12152B; --surface:#1B2040; --surface2:#262C57; --text:#ECEBFA; --muted:#A5AAD3; --line:#363E70;
+    --accent:#FFB547; --accent-ink:#2A1B00; --accent-text:#FFC36B;
+    --safe:#5BE3B0; --safe-bg:#12392F; --danger:#FF7081; --danger-bg:#41202C; --info:#78CBFF; --info-bg:#16344D;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#12152B; --surface:#1B2040; --surface2:#262C57; --text:#ECEBFA; --muted:#A5AAD3; --line:#363E70;
+  --accent:#FFB547; --accent-ink:#2A1B00; --accent-text:#FFC36B;
+  --safe:#5BE3B0; --safe-bg:#12392F; --danger:#FF7081; --danger-bg:#41202C; --info:#78CBFF; --info-bg:#16344D;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:'Bricolage Grotesque','Figtree',system-ui,sans-serif;line-height:1.12;margin:0 0 .5em;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,5.5vw,3.3rem);font-weight:800}
+h2{font-size:clamp(1.3rem,3vw,1.7rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0 0 1em;max-width:68ch}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.muted{color:var(--muted)}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+.brand{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.15rem;background:none;border:0;padding:4px 0;display:flex;align-items:center;gap:8px}
+.brand i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 28%,transparent)}
+.rank{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.92rem}
+.rank b{font-weight:700}
+.xpbar{width:110px;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.xpbar span{display:block;height:100%;background:var(--accent);transition:width .5s}
+.tbtn{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:.88rem}
+main{padding:28px 0 60px}
+
+/* buttons & forms */
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:11px 18px;font-weight:700}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.link{background:none;border:0;padding:4px 0;color:var(--accent-text);font-weight:600;margin-bottom:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+input[type=text]{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.15rem;padding:13px 14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--text)}
+label{display:block;font-weight:600;margin-bottom:6px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+/* surfaces */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.notice{background:var(--info-bg);color:var(--text);border-left:5px solid var(--info);border-radius:8px;padding:10px 14px;margin:0 0 18px;font-size:.95rem}
+.fb{border-radius:10px;padding:12px 14px;margin-top:12px;border-left:5px solid}
+.fb.good{background:var(--safe-bg);border-color:var(--safe)}
+.fb.bad{background:var(--danger-bg);border-color:var(--danger)}
+.fb.meh{background:var(--surface2);border-color:var(--accent)}
+.fb p:last-child{margin-bottom:0}
+.fb strong{display:block;margin-bottom:2px}
+.tag{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.82rem;font-weight:700;background:var(--surface2)}
+.tag.good{background:var(--safe-bg);color:var(--safe)} .tag.bad{background:var(--danger-bg);color:var(--danger)}
+
+/* hub */
+.hero{display:grid;gap:10px;margin-bottom:30px}
+.hero p{font-size:1.12rem;color:var(--muted)}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+.case{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.case:hover{border-color:var(--accent)}
+.case .ico{width:52px;height:52px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;color:var(--accent-text)}
+.case strong{font-family:'Bricolage Grotesque',sans-serif;font-size:1.25rem;display:block}
+.case .meta{display:block;margin-top:8px}
+.case.locked{opacity:.6}
+.capstone{margin-top:14px;border-style:dashed}
+
+/* module chrome */
+.mod h1{font-size:clamp(1.8rem,4.5vw,2.6rem)}
+.stepline{color:var(--muted);margin:-.2em 0 18px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;align-items:start}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+
+/* password lab */
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.seg button{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.92rem;text-align:left}
+.seg button[aria-pressed=true]{border-color:var(--accent);background:var(--surface2);font-weight:700}
+.vault{width:100%;max-width:240px;display:block;margin:0 auto}
+.meter{height:16px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:6px 0}
+.meter span{display:block;height:100%;background:var(--danger);transition:width .5s}
+.rate{font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:800}
+.rate.bad{color:var(--danger)} .rate.mid{color:var(--accent-text)} .rate.good{color:var(--safe)}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t td{padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+table.t td:last-child{text-align:right;font-weight:700;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 16px}
+.chip{background:var(--surface);border:1.5px solid var(--line);border-radius:99px;padding:5px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88rem}
+.chip:hover{border-color:var(--accent)}
+ul.tips{padding-left:1.1em;margin:.4em 0}
+ul.tips li{margin:.25em 0}
+
+/* breach sim */
+.acct{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.acct:first-child{border-top:0}
+.acct .st{font-weight:700;font-size:.9rem}
+.acct .st.fell{color:var(--danger)} .acct .st.safe{color:var(--safe)}
+.sw{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.sw button{background:var(--surface);border:0;padding:6px 11px;font-size:.88rem}
+.sw button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+
+/* quiz */
+.opts{display:grid;gap:10px;margin:14px 0}
+.opt{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--safe);background:var(--safe-bg)}
+.opt.wrong{border-color:var(--danger);background:var(--danger-bg)}
+.opt[disabled]{cursor:default}
+
+/* triage */
+.msg{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.msg-h{display:flex;gap:10px;align-items:center;padding:12px 16px;background:var(--surface2);flex-wrap:wrap}
+.msg-h .av{width:36px;height:36px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800}
+.msg-h .ch{margin-left:auto;font-size:.85rem;color:var(--muted)}
+.msg-b{padding:16px}
+.fakelink{color:var(--info);text-decoration:underline;word-break:break-all}
+.insp{background:var(--surface2);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:.95rem}
+.insp h3{font-size:1rem;margin-bottom:4px}
+.qr{width:96px;height:96px;display:block;margin:10px 0;background:#fff;padding:6px;border-radius:6px}
+.prog{display:flex;gap:5px;margin:0 0 14px}
+.prog i{flex:1;height:6px;border-radius:99px;background:var(--surface2)}
+.prog i.on{background:var(--accent)} .prog i.ok{background:var(--safe)} .prog i.no{background:var(--danger)}
+
+/* access control */
+.person{display:grid;grid-template-columns:1fr;gap:8px;padding:14px 0;border-top:1px solid var(--line)}
+.person:first-child{border-top:0}
+.person .lv{display:flex;flex-wrap:wrap;gap:6px}
+.person .lv button{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;font-size:.88rem}
+.person .lv button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.perm{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+
+/* bug bounty */
+.portal{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;color:#1a1d33}
+.portal .bar{background:#dfe2f2;padding:8px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;color:#444a78}
+.portal .body{padding:16px;display:grid;gap:14px}
+.hot{display:block;width:100%;text-align:left;background:#f4f5fc;border:2px dashed #9aa1d6;border-radius:10px;padding:10px 12px;color:#1a1d33}
+.hot:hover{border-color:#e08a00}
+.hot.found{border-style:solid;border-color:#0B7A55;background:#e2f6ee}
+.sticky{background:#ffe27a;transform:rotate(-1.5deg);padding:6px 10px;display:inline-block;font-family:'Comic Sans MS',cursive;font-size:.85rem;margin-top:6px}
+.log li{margin:.5em 0}
+.cipher{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.25rem;letter-spacing:.06em;word-break:break-word;background:var(--surface2);border-radius:10px;padding:12px 14px;margin:8px 0}
+
+/* capstone */
+.tl{position:relative;margin:10px 0;padding-left:26px}
+.tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;background:var(--line);border-radius:3px}
+.ev{position:relative;margin-bottom:18px}
+.ev::before{content:"";position:absolute;left:-26px;top:6px;width:19px;height:19px;border-radius:50%;background:var(--danger);border:4px solid var(--bg)}
+.ev.fixed::before{background:var(--safe)}
+.closed{background:var(--surface);border:1px solid var(--safe);border-radius:16px;padding:22px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  .top,.noprint{display:none!important}
+  body{background:#fff;color:#000;font-size:12pt}
+  .card{border:1px solid #999}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <button class="brand" data-act="home" aria-label="Night Shift home"><i></i>Night Shift</button>
+    <div class="rank" id="rank"></div>
+    <button class="tbtn" data-act="theme" id="themeBtn" aria-label="Switch light or dark theme">Theme</button>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers & state ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const app = $('#app');
+const LS = 'nightshift.v1';
+let S = {xp:0, done:{}, theme:null};
+try { const r = localStorage.getItem(LS); if (r) S = Object.assign(S, JSON.parse(r)); } catch(e) {}
+function save(){ try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e) {} }
+function shuffle(a){ const b = a.slice(); for (let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+if (S.theme) document.documentElement.setAttribute('data-theme', S.theme);
+
+const RANKS = [[0,'Intern'],[100,'Junior analyst'],[200,'Analyst'],[400,'Senior analyst'],[550,'Incident lead']];
+function rankInfo(){
+  let cur = RANKS[0], next = null;
+  for (let i=0;i<RANKS.length;i++){ if (S.xp >= RANKS[i][0]){ cur = RANKS[i]; next = RANKS[i+1] || null; } }
+  return {cur, next};
+}
+function renderRank(){
+  const r = rankInfo();
+  const pct = r.next ? Math.round((S.xp - r.cur[0]) / (r.next[0] - r.cur[0]) * 100) : 100;
+  $('#rank').innerHTML = `<span><b>${r.cur[1]}</b> &middot; ${S.xp} XP</span><span class="xpbar" role="img" aria-label="${pct}% of the way to the next rank"><span style="width:${pct}%"></span></span>`;
+}
+function award(id, xp){
+  if (S.done[id]) return false;
+  S.done[id] = true; S.xp += xp; save(); renderRank(); return true;
+}
+const MODS_DONE = () => ['pw','ph','ac','bb'].filter(k => S.done[k]).length;
+
+/* ---------- router & global actions ---------- */
+const VIEWS = {};
+function go(v){
+  window.scrollTo(0,0);
+  VIEWS[v]();
+  const h = app.querySelector('h1');
+  if (h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+}
+const ACT = {
+  home: () => go('hub'),
+  go: (el) => go(el.dataset.v),
+  theme: () => {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    S.theme = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', S.theme); save();
+  },
+  print: () => window.print(),
+  reset: () => {
+    if (confirm('Reset all progress on this device?')) { S = {xp:0, done:{}, theme:S.theme}; save(); renderRank(); go('hub'); }
+  }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (el && ACT[el.dataset.act]) ACT[el.dataset.act](el, e);
+});
+
+/* ---------- shared pieces ---------- */
+function ic(n){
+  const p = {
+    lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    hook:'<path d="M3 7l9 6 9-6"/><rect x="3" y="5" width="18" height="14" rx="2"/>',
+    keys:'<circle cx="8" cy="9" r="3.5"/><path d="M11 11l8 8M16 16l2-2M14 14l2-2"/>',
+    bug:'<rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M4 12h4M16 12h4M5 18l3-2M19 18l-3-2M5 6l3 2M19 6l-3 2"/>',
+    flag:'<path d="M6 21V4M6 5h11l-2 4 2 4H6"/>'
+  }[n];
+  return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+}
+function frame(title, step, inner){
+  return `<div class="mod"><button class="link" data-act="home">&lsaquo; Back to cases</button><h1>${title}</h1>${step ? `<p class="stepline">${step}</p>` : ''}${inner}</div>`;
+}
+function closed(id, title, xp, points){
+  const first = award(id, xp);
+  return `<div class="closed"><h2>Case closed: ${title}</h2><p>${first ? `+${xp} XP added to your rank.` : 'You already finished this one, so no new XP. Replay any time.'}</p><ul class="tips">${points.map(p => `<li>${p}</li>`).join('')}</ul><div class="row"><button class="btn" data-act="home">Back to cases</button></div></div>`;
+}
+function runQuiz(root, qs, done){
+  let i = 0, score = 0;
+  function show(){
+    const q = qs[i];
+    const opts = shuffle(q.o.map((t,k) => ({t,k})));
+    root.innerHTML = `<div class="card"><p class="muted">Question ${i+1} of ${qs.length}</p><h2>${q.q}</h2><div class="opts">${opts.map((o,n) => `<button class="opt" data-n="${n}">${o.t}</button>`).join('')}</div><div class="fbw" aria-live="polite"></div></div>`;
+    root.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+      const o = opts[+b.dataset.n]; const ok = o.k === q.a;
+      if (ok) score++;
+      root.querySelectorAll('.opt').forEach((x,n) => { x.disabled = true; if (opts[n].k === q.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      const last = i === qs.length - 1;
+      root.querySelector('.fbw').innerHTML = `<div class="fb ${ok ? 'good' : 'bad'}"><strong>${ok ? 'Right call.' : 'Not quite.'}</strong><p>${q.why}</p></div><div class="row"><button class="btn" id="qnext">${last ? 'Finish' : 'Next question'}</button></div>`;
+      $('#qnext', root).addEventListener('click', () => { if (last) done(score, qs.length); else { i++; show(); } });
+      $('#qnext', root).focus();
+    }));
+  }
+  show();
+}
+
+/* ---------- HUB ---------- */
+const CASES = [
+  {id:'pw', ico:'lock', name:'Crack Lab', mins:8, text:'Type a password, then watch a cracking bot go after it. See how one breach can topple every account you own.'},
+  {id:'ph', ico:'hook', name:'Triage', mins:8, text:'Eight messages hit your queue. Decide which are real and which are traps, using the clues attackers leave behind.'},
+  {id:'ac', ico:'keys', name:'Access Control', mins:8, text:'Hand out roles, share files and approve app permissions. Learn why everyone should get only the access their job needs.'},
+  {id:'bb', ico:'bug', name:'Bug Bounty Jr.', mins:10, text:'Spot weak points in a practice target, then decide what a responsible researcher does next.'}
+];
+VIEWS.hub = () => {
+  const n = MODS_DONE();
+  app.innerHTML = `
+  <section class="hero">
+    <h1>Your first shift starts now.</h1>
+    <p>Gamerly is a small game studio, and you just joined its security team. Work through four case files, then take on a real incident. Each one takes about ten minutes, and you can play them in any order.</p>
+    <p class="muted" style="font-size:.95rem">Everything runs in your browser. Nothing you type is sent anywhere or saved except your progress, which stays on this device.</p>
+  </section>
+  <div class="cases">
+    ${CASES.map(c => `<button class="case" data-act="go" data-v="${c.id}"><span class="ico">${ic(c.ico)}</span><span><strong>${c.name}</strong><span class="muted">${c.text}</span><span class="meta"><span class="tag ${S.done[c.id] ? 'good' : ''}">${S.done[c.id] ? 'Completed' : `About ${c.mins} min`}</span></span></span></button>`).join('')}
+  </div>
+  <button class="case capstone ${n < 4 ? 'locked' : ''}" style="width:100%" ${n < 4 ? 'disabled' : 'data-act="go" data-v="cap"'}>
+    <span class="ico">${ic('flag')}</span>
+    <span><strong>The Gamerly incident</strong><span class="muted">${n < 4 ? `Finish all four case files to unlock this (${n} of 4 done). A breach is under way and you will trace how it happened.` : 'A breach is under way. Trace how weak passwords, a phishing click and loose permissions combined, then fix each link in the chain.'}</span><span class="meta"><span class="tag ${S.done.cap ? 'good' : ''}">${S.done.cap ? 'Completed' : (n < 4 ? 'Locked' : 'Ready')}</span></span></span>
+  </button>
+  <div class="row noprint" style="margin-top:28px">
+    <button class="btn ghost" data-act="go" data-v="grown">For parents and teachers</button>
+    <button class="link" data-act="reset" style="margin:0 0 0 auto">Reset progress</button>
+  </div>`;
+};
+
+/* =====================================================
+   CASE 1: CRACK LAB
+   ===================================================== */
+const COMMON = ['password','123456','12345678','123456789','1234567890','qwerty','abc123','letmein','iloveyou','admin','welcome','monkey','dragon','football','minecraft','fortnite','roblox','princess','sunshine','master','shadow','superman','batman','pokemon','starwars','trustno1','login','passw0rd','baseball','soccer','hello','freedom','whatever','qazwsx','1q2w3e4r','111111','000000','123123','654321','password1','gaming','gamer','ninja','secret','cookie','summer','love','jordan','michael','charlie','tigger','hockey','basketball','computer','internet','google','snapchat','tiktok','amazing','flower','rainbow'];
+const WORDS = 'able about above account acid actor alarm alien all alpha anchor angel animal apple april arrow ash atlas aunt autumn baby back bacon badge bag bake ball banana band bank barn basket battery beach bean bear beat bed bee bell belt bench bike bird black blade blue boat bone book boot boss bottle bowl box brain bread brick bridge bright brown brush bubble bucket bunny cabin cake camera camp candy canoe captain car card carpet castle cat chair chalk cheese cherry chicken child circle city clock cloud clown coat coffee color comet cook copper correct couch cow crab crayon cream crown cup dance dark day desk diamond dinner dog doll door dragon dream dress drum duck eagle earth egg elbow engine fairy farm feather fence field finger fire fish flag flame floor flower fog forest fox frog fruit game garden gate ghost giant glass glove goat gold grape grass green guitar hammer hand happy hat hawk heart helmet hill honey horse house ice island jacket jelly jungle kettle key kite kitchen knight ladder lake lamp leaf lemon light lion lizard magic map marble meadow melon milk mirror monkey moon mountain mouse music needle nest night ocean olive orange otter owl paint pancake panda paper parrot pasta peach pearl pencil penguin piano pickle pillow pilot pizza planet pocket potato puddle pumpkin purple puzzle queen rabbit radio rain river robot rocket rose sail salad sand school sea seven shadow sheep shell silver sky snake snow spider spoon square staple star storm sugar summer sun swim table tea tiger toast tomato tower train tree truck tulip tuesday turtle umbrella valley violin water whale wheel window winter wolf yellow zebra'.split(' ').filter(w => w.length >= 3);
+const WSET = new Set(WORDS.concat(['fortnite','minecraft','roblox','sunshine','password','football','princess','superman','batman','pokemon','welcome','letmein','iloveyou','dragon','monkey','master','shadow','love','gamer','ninja']));
+const RATES = [
+  {r:10, label:'Guessing at a website login', note:'The site blocks you after a few tries, so about 10 guesses a second at best.'},
+  {r:1e4, label:'Stolen database, slow hashing', note:'The site protected passwords with a deliberately slow scramble.'},
+  {r:1e10, label:'Stolen database, fast hashing', note:'The site used a quick scramble and the thief has strong hardware.'}
+];
+function unleet(s, one){ const m = {'@':'a','4':'a','3':'e','!':'i','0':'o','$':'s','5':'s','7':'t','+':'t'}; m['1'] = one; return s.replace(/[@43!0$571+]/g, c => m[c]); }
+function segment(s){
+  const n = s.length, dp = Array(n+1).fill(Infinity); dp[0] = 0;
+  for (let i=1;i<=n;i++) for (let j=Math.max(0,i-12);j<i;j++) if (dp[j]+1 < dp[i] && WSET.has(s.slice(j,i))) dp[i] = dp[j]+1;
+  return dp[n] === Infinity ? 0 : dp[n];
+}
+function analyze(pw){
+  const len = pw.length; let pool = 0;
+  if (/[a-z]/.test(pw)) pool += 26; if (/[A-Z]/.test(pw)) pool += 26; if (/\d/.test(pw)) pool += 10; if (/[^A-Za-z0-9]/.test(pw)) pool += 33;
+  let best = Math.pow(pool || 1, len), kind = 'random', words = 0;
+  const lower = pw.toLowerCase();
+  if (/^(.)\1*$/.test(pw)) { best = Math.min(best, 1e3); kind = 'pattern'; }
+  const seqs = ['abcdefghijklmnopqrstuvwxyz','qwertyuiop','asdfghjkl','zxcvbnm','1234567890','0987654321'];
+  if (len >= 4 && seqs.some(q => q.includes(lower))) { best = Math.min(best, 1e4); kind = 'pattern'; }
+  ['i','l'].forEach(v => {
+    const norm = unleet(lower, v);
+    const idx = COMMON.indexOf(norm);
+    if (idx >= 0 && (idx+1)*20 < best) { best = (idx+1)*20; kind = 'common'; }
+    const coreRaw = lower.replace(/[^a-z]+$/, ''); const extras = len - coreRaw.length;
+    const ci = COMMON.indexOf(unleet(coreRaw, v));
+    if (ci >= 0 && coreRaw.length >= 4) { const g = (ci+1)*20*8*Math.pow(10, Math.min(extras,6)); if (g < best) { best = g; kind = 'common'; } }
+    const letters = norm.replace(/[^a-z]/g, '');
+    const k = letters.length >= 3 ? segment(letters) : 0;
+    if (k > 0) {
+      const ex = pw.replace(/[a-z]/gi, '').length;
+      const g = Math.pow(3000, k) * 8 * Math.pow(6, Math.min(ex, 8));
+      if (g < best) { best = g; kind = 'words'; words = k; }
+    }
+  });
+  return {g: Math.max(best, 1), kind, len, words};
+}
+function fmtTime(sec){
+  if (sec < 0.001) return 'instantly';
+  if (sec < 1) return 'under a second';
+  if (sec < 60) return Math.round(sec) + ' seconds';
+  const mi = sec/60; if (mi < 60) return Math.round(mi) + ' minutes';
+  const hr = mi/60; if (hr < 24) return Math.round(hr) + ' hours';
+  const dy = hr/24; if (dy < 365) return Math.round(dy) + ' days';
+  const yr = dy/365.25; if (yr < 1000) return Math.round(yr).toLocaleString() + ' years';
+  if (yr < 1e6) return Math.round(yr/1000).toLocaleString() + ' thousand years';
+  if (yr < 1e9) return Math.round(yr/1e6).toLocaleString() + ' million years';
+  if (yr < 1e12) return Math.round(yr/1e9).toLocaleString() + ' billion years';
+  return 'over a trillion years';
+}
+function vault(bolts, tone, broken){
+  const col = {bad:'var(--danger)', mid:'var(--accent)', good:'var(--safe)'}[tone];
+  let b = '';
+  for (let i=0;i<8;i++){ const a = i*Math.PI/4, x = 110+92*Math.cos(a), y = 110+92*Math.sin(a);
+    b += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="${i < bolts ? col : 'none'}" stroke="${col}" stroke-width="2.5"/>`; }
+  let sp = '';
+  for (let i=0;i<4;i++){ const a = i*Math.PI/2 + Math.PI/4; sp += `<line x1="110" y1="110" x2="${(110+32*Math.cos(a)).toFixed(1)}" y2="${(110+32*Math.sin(a)).toFixed(1)}" stroke="${col}" stroke-width="5" stroke-linecap="round"/>`; }
+  const crack = broken ? '<path d="M64 66 L100 104 L86 114 L132 158" fill="none" stroke="var(--danger)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' : '';
+  return `<svg viewBox="0 0 220 220" class="vault" role="img" aria-label="Vault door with ${bolts} of 8 bolts locked${broken ? ', cracked open' : ''}"><circle cx="110" cy="110" r="104" fill="var(--surface2)" stroke="var(--line)" stroke-width="3"/><circle cx="110" cy="110" r="70" fill="var(--bg)" stroke="${col}" stroke-width="5"/>${b}${sp}<circle cx="110" cy="110" r="10" fill="${col}"/>${crack}</svg>`;
+}
+const PW = {rate:2};
+VIEWS.pw = () => pwStage(0);
+function pwStage(n){
+  if (n === 0){
+    app.innerHTML = frame('Crack Lab', 'Step 1 of 3: test a password', `
+      <div class="notice">Never type a real password into any website or app that isn't the account's own login page, including this one. Use made-up ones here.</div>
+      <div class="two">
+        <div>
+          <label for="pwin">Try a password</label>
+          <input id="pwin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type something to test">
+          <div class="chips" role="group" aria-label="Examples to try">
+            ${['sunshine','P@ssw0rd!','Fortnite2024','k9#Lp2!x','purple-bicycle-anchor-pancake','correct horse battery staple'].map(x => `<button class="chip" data-ex="${x}">${x}</button>`).join('')}
+          </div>
+          <p class="muted" style="margin-bottom:6px">Pick the attacker you want to face:</p>
+          <div class="seg" id="seg">${RATES.map((r,i) => `<button data-r="${i}" aria-pressed="${i === PW.rate}">${r.label}</button>`).join('')}</div>
+          <div id="pwout"></div>
+        </div>
+        <div id="pwvault" aria-hidden="false"></div>
+      </div>
+      <p class="muted" style="font-size:.9rem;margin-top:16px">This estimator is simplified. Real attackers use bigger word lists and smarter rules, so treat the numbers as a rough guide.</p>
+      <div class="row"><button class="btn" id="pwnext">Next: see a breach spread</button></div>`);
+    const inp = $('#pwin');
+    inp.addEventListener('input', pwUpdate);
+    app.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => { inp.value = b.dataset.ex; pwUpdate(); inp.focus(); }));
+    $('#seg').addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (!b) return; PW.rate = +b.dataset.r; $('#seg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.r === PW.rate))); pwUpdate(); });
+    $('#pwnext').addEventListener('click', () => { window.scrollTo(0,0); pwStage(1); });
+    pwUpdate();
+  } else if (n === 1){
+    pwBreach();
+  } else {
+    app.innerHTML = frame('Crack Lab', 'Step 3 of 3: quick check', '<div id="qz"></div>');
+    runQuiz($('#qz'), [
+      {q:'Which password is hardest to crack?', o:['Tr0ub4dor&3','purple-bicycle-anchor-pancake-tuesday','MyDogMax2010!','P@ssw0rd!'], a:1, why:'Length wins. Several unrelated words are long, easy for you to remember and hard to guess. Swapping letters for symbols, like a to @, is a trick every cracker already knows.'},
+      {q:'Why is a password manager worth using?', o:['It makes one super-secret password you use everywhere','It creates and remembers a different long password for every account, so you only memorize one','It stops phishing emails from arriving','It lets you share passwords with friends safely'], a:1, why:'Unique passwords limit the damage of any single breach. A manager does the remembering so you can actually use a different one for each account.'},
+      {q:'Your phone buzzes with a login code you never asked for. What does that most likely mean?', o:['The app is broken','Someone knows your password and is trying to sign in','Your phone is hacked','You won a prize'], a:1, why:'A code you did not request means someone has your password and is stuck at the second lock. Change the password, turn on app-based two-factor authentication, and never read that code out to anyone.'},
+      {q:'Why do good sites store a scrambled "hash" of your password instead of the password itself?', o:['It saves storage space','A breach then leaks scrambles instead of readable passwords, although weak ones can still be guessed','It makes passwords impossible to crack','It lets the site email your password back to you'], a:1, why:`Hashing means a thief gets scrambles, not the real thing. But the bot just hashes millions of guesses and compares, which is why weak passwords still fall. Sites that can email you your old password are doing it wrong.`}
+    ], (s,t) => {
+      app.innerHTML = frame('Crack Lab', '', closed('pw', 'Crack Lab', 100, [`You scored ${s} of ${t} on the check.`, 'Length beats cleverness. Aim for 14 or more characters, or a string of unrelated words.', 'Never reuse a password. One breach should only ever cost you one account.', 'Turn on two-factor authentication, starting with your email.']));
+    });
+  }
+}
+function pwUpdate(){
+  const v = $('#pwin').value, out = $('#pwout'), vb = $('#pwvault');
+  if (!v){ out.innerHTML = '<p class="muted">Type something to see how a cracking bot would handle it.</p>'; vb.innerHTML = vault(0,'bad',false); return; }
+  const a = analyze(v), g = a.g, lg = Math.log10(g);
+  const bolts = Math.max(0, Math.min(8, Math.floor(lg/2)));
+  const fastSec = g/2/RATES[2].r;
+  const tone = fastSec < 3600 ? 'bad' : fastSec < 3e7 ? 'mid' : 'good';
+  const label = fastSec < 3600 ? 'Weak' : fastSec < 3e7 ? 'Fair' : fastSec < 3e10 ? 'Strong' : 'Very strong';
+  const p = Math.min(1, RATES[PW.rate].r * 3600 / g);
+  const pct = p >= 0.999 ? '100%' : p < 0.0001 ? 'less than 0.01%' : (p*100).toFixed(p < 0.1 ? 2 : 0) + '%';
+  const tips = [];
+  if (a.kind === 'common') tips.push('This one, or a tiny variation of it, is on every attacker\'s list. Adding a number or swapping letters for symbols barely slows them down.');
+  if (a.kind === 'pattern') tips.push('Keyboard runs and repeats are the first things a bot tries.');
+  if (a.kind === 'words' && a.words === 1) tips.push('One dictionary word plus a few tweaks falls quickly.');
+  if (a.kind === 'words' && a.words >= 2) tips.push(`${a.words} dictionary words is a good start. Each extra unrelated word multiplies the work by thousands.`);
+  if (a.kind === 'random' && a.len < 12) tips.push('Even a random password stays safe only if it is long enough. Short ones fall to fast hardware.');
+  if (a.len < 14) tips.push('Aim for 14 or more characters.');
+  if (tone === 'good') tips.push('Strong. Now use a different one for every account.');
+  out.innerHTML = `
+    <div class="card" style="margin-top:8px">
+      <div class="rate ${tone}">${label}</div>
+      <p class="muted" style="margin-bottom:4px">After one hour, this bot has cracked about:</p>
+      <div class="meter" role="img" aria-label="Cracked ${pct}"><span style="width:${Math.max(p*100, 1.5)}%"></span></div>
+      <p><b>${pct}</b> of the possibilities. ${RATES[PW.rate].note}</p>
+      <table class="t"><tbody>${RATES.map(r => `<tr><td>${r.label}</td><td>${fmtTime(g/2/r.r)}</td></tr>`).join('')}</tbody></table>
+      <ul class="tips">${tips.slice(0,3).map(t => `<li>${t}</li>`).join('')}</ul>
+    </div>`;
+  vb.innerHTML = vault(bolts, tone, p >= 0.999) + `<p class="muted" style="text-align:center;font-size:.9rem">${bolts} of 8 bolts locked</p>`;
+}
+function pwBreach(){
+  const accts = [
+    {id:'game', n:'GameStore'}, {id:'mail', n:'Email'}, {id:'soc', n:'Social app'}, {id:'school', n:'School login'}, {id:'stream', n:'Streaming'}
+  ];
+  const st = {reuse:{game:true, mail:true, soc:true, school:true, stream:true}, tfa:false, ran:false};
+  function draw(res){
+    app.innerHTML = frame('Crack Lab', 'Step 2 of 3: one key, every door', `
+      <p>GameStore just announced a data breach. Attackers now have the email and password you used there. Choose how you set up your other accounts, then run the simulation.</p>
+      <div class="card">
+        ${accts.map(a => {
+          const r = res && res[a.id];
+          return `<div class="acct">
+            <div><b>${a.n}</b>${a.id === 'game' ? ' <span class="muted">(the one that got breached)</span>' : ''}${a.id === 'mail' ? `<br><span class="muted" style="font-size:.9rem">Two-factor authentication:</span> <span class="sw"><button data-tfa="0" aria-pressed="${!st.tfa}">Off</button><button data-tfa="1" aria-pressed="${st.tfa}">On</button></span>` : ''}</div>
+            <div>${a.id === 'game' ? '<span class="muted">Fixed</span>' : `<span class="sw" role="group" aria-label="${a.n} password"><button data-a="${a.id}" data-v="1" aria-pressed="${st.reuse[a.id]}">Same password</button><button data-a="${a.id}" data-v="0" aria-pressed="${!st.reuse[a.id]}">Unique</button></span>`}</div>
+            ${r ? `<div class="st ${r.fell ? 'fell' : 'safe'}" style="grid-column:1/-1">${r.fell ? 'Hijacked' : 'Safe'}: ${r.why}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="row"><button class="btn" id="sim">Simulate the breach</button>${res ? '<button class="btn ghost" id="cont">Continue to the check</button>' : ''}</div>
+      ${res ? `<div class="fb ${res._fell <= 1 ? 'good' : 'bad'}" aria-live="polite"><strong>${res._fell <= 1 ? 'Contained.' : `${res._fell} accounts lost.`}</strong><p>${res._msg}</p></div>` : ''}`);
+    app.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => { st.reuse[b.dataset.a] = b.dataset.v === '1'; draw(null); }));
+    app.querySelectorAll('[data-tfa]').forEach(b => b.addEventListener('click', () => { st.tfa = b.dataset.tfa === '1'; draw(null); }));
+    $('#sim').addEventListener('click', () => draw(simulate()));
+    if (res) $('#cont').addEventListener('click', () => { window.scrollTo(0,0); pwStage(2); });
+  }
+  function simulate(){
+    const res = {}; let mailFell = false;
+    if (st.reuse.mail && !st.tfa) mailFell = true;
+    accts.forEach(a => {
+      if (a.id === 'game') { res.game = {fell:true, why:'the breach happened here, so the password is now public.'}; return; }
+      if (a.id === 'mail') {
+        if (st.reuse.mail && st.tfa) res.mail = {fell:false, why:'the attacker had the password but your second lock stopped them.'};
+        else if (st.reuse.mail) res.mail = {fell:true, why:'same password, no second lock.'};
+        else res.mail = {fell:false, why:'a different password, so the leaked one was useless.'};
+        return;
+      }
+      if (st.reuse[a.id]) res[a.id] = {fell:true, why:'the leaked password worked here too.'};
+      else if (mailFell) res[a.id] = {fell:true, why:'the attacker took over your email, then used "forgot password" to reset this account.'};
+      else res[a.id] = {fell:false, why:'a unique password, and your email is still locked down.'};
+    });
+    const fell = Object.values(res).filter(r => r.fell).length;
+    res._fell = fell;
+    res._msg = fell <= 1 ? 'Only GameStore was affected. Unique passwords stop the spread, and two-factor on your email protects every account that uses it for resets.' :
+      mailFell ? 'Your email is the master key: whoever controls it can reset passwords everywhere. Give it a unique password and turn on two-factor.' :
+      'Attackers feed leaked logins into other sites automatically. Reusing a password turns one breach into many.';
+    return res;
+  }
+  draw(null);
+}
+
+/* =====================================================
+   CASE 2: TRIAGE
+   ===================================================== */
+function qrSvg(){
+  let r = '', seed = 7;
+  for (let y=0;y<11;y++) for (let x=0;x<11;x++){
+    seed = (seed * 9301 + 49297) % 233280;
+    const corner = (x<3&&y<3)||(x>7&&y<3)||(x<3&&y>7);
+    if (corner || seed/233280 > .52) r += `<rect x="${x*8}" y="${y*8}" width="8" height="8" fill="#111"/>`;
+  }
+  return `<svg class="qr" viewBox="0 0 88 88" role="img" aria-label="A QR code on a sticker">${r}</svg>`;
+}
+const MSGS = [
+  {ch:'Discord DM', from:'Nitro Giveaways', av:'N', body:'Congrats! You have been gifted 3 months of Nitro. It expires in 10 minutes, so claim it now.', link:{t:'discord-gift.com/claim', real:'discord-gifts.claim-now.co/login'}, phish:true,
+   insp:['The sender account was created 2 days ago.','The link really goes to discord-gifts.claim-now.co, a different site that asks for your login.'],
+   clues:['A countdown timer to rush you','A prize you never entered for','A lookalike link on a different domain'],
+   why:'Real gifts show up inside the app, not through a link from a stranger. Typing your login there hands over your account, and the scammer then messages your friends from it.'},
+  {ch:'Instagram DM', from:'Copyright Support', av:'C', body:'Your account will be disabled in 24 hours because of a copyright violation. Appeal here to keep your account.', link:{t:'Appeal this decision', real:'instagram-appeal.help/form'}, phish:true,
+   insp:['The sender is a normal account that just chose a professional-sounding name. It has no verification badge.','The link goes to instagram-appeal.help, not instagram.com.'],
+   clues:['A threat with a deadline','The platform would use in-app notices, not a random DM','The link domain is not the real site'],
+   why:'Fear is the hook. Real platforms send notices inside your account settings. Go there yourself and look instead of clicking the DM.'},
+  {ch:'Text message', from:'+1 (555) 013-8821', av:'?', body:'Parcel delivery failed. Pay a $1.99 redelivery fee or your package will be returned.', link:{t:'pkg-redeliver.top/pay', real:'pkg-redeliver.top/pay'}, phish:true,
+   insp:['It came from an unknown number.','The link ends in .top and is not a courier website.','You were not expecting a package.'],
+   clues:['You did not order anything','A tiny fee is a way to grab card details','An unfamiliar link domain'],
+   why:'The fee is bait. The real goal is your card number. If you are expecting something, check the courier\'s own app or site.'},
+  {ch:'School email', from:'Mr. Okafor', av:'O', addr:'okafor@lincolnhigh.example', body:'Hi class, the chapter 4 slides are in our shared folder. Bring your questions on Thursday.', link:{t:'Open shared folder', real:'docs.lincolnhigh.example/ch4'}, phish:false,
+   insp:['The address matches the school\'s domain, and you were expecting this.','The link stays on the school\'s own domain.'],
+   clues:['Known sender, expected message','No request for a password or money','The link stays on the official domain'],
+   why:'Everything lines up: a person you know, a normal request, a link on the right domain. Being careful does not mean distrusting everything.'},
+  {ch:'Chat', from:'Dana (your friend)', av:'D', body:'omg wrong number lol, i am locked out of my account. can u read me the 6 digit code that just got texted to u?? quick pls', phish:true,
+   insp:['Dana normally writes in full sentences.','The code that arrives on YOUR phone is the login code for YOUR account.'],
+   clues:['Asking for a login code','Urgent and a little off from how Dana talks','Friends\' accounts get hijacked, so familiar names can lie'],
+   why:'A login code is the one thing standing between an attacker and your account. Never read it out. Check with Dana through a different channel, like calling or seeing her in person.'},
+  {ch:'Email', from:'Gamerly Security', av:'G', addr:'no-reply@gamerly.example', body:'We noticed a new sign-in from a different device. If this was you, no action is needed. If it was not, open the Gamerly app and change your password.', phish:false,
+   insp:['The address matches the company domain.','There is no link and no request for your password. It tells you to open the app yourself.'],
+   clues:['Matches the official domain','No link to click','Sends you to the app, not to a form'],
+   why:'This is how a real alert behaves: it informs you and points you to the official app. Ignoring real alerts is also a risk, so check your account directly.'},
+  {ch:'School email', from:'IT Helpdesk', av:'I', addr:'helpdesk@lincolnhigh-it.example.net', body:'Your mailbox is 98% full. Verify your login within 12 hours or your email will be deleted.', link:{t:'Verify account', real:'lincolnhigh-it.example.net/verify'}, phish:true,
+   insp:['The address ends in lincolnhigh-it.example.net, not the school\'s real domain.','Schools do not delete your mailbox over a missing click.'],
+   clues:['A near-miss version of the school\'s domain','Urgent deadline with a threat','It asks you to log in through a link'],
+   why:'Attackers register lookalike domains. When the "who" does not exactly match, stop. Ask IT in person or use the school portal you already know.'},
+  {ch:'Sticker on a bus shelter', from:'Free game skins', av:'S', qr:true, body:'SCAN FOR FREE GAME SKINS. No download needed!', link:{t:'(QR code)', real:'skinz-free.win/login'}, phish:true,
+   insp:['The QR code opens skinz-free.win/login, a page that asks for your game login.','A sticker on a public surface can be placed by anyone.'],
+   clues:['You cannot see where a QR code leads until you scan it','Free items that need your login','Printed on a public surface anyone can stick things on'],
+   why:'A QR code is just a link you cannot read. Treat it like any unknown link: check the preview of where it goes before you open it, and never log in through it.'}
+];
+const PH = {};
+VIEWS.ph = () => { PH.q = shuffle(MSGS); PH.i = 0; PH.ok = 0; PH.res = []; PH.insp = false; phShow(); };
+function phShow(){
+  const m = PH.q[PH.i];
+  const bar = PH.q.map((_,k) => `<i class="${PH.res[k] === true ? 'ok' : PH.res[k] === false ? 'no' : k === PH.i ? 'on' : ''}"></i>`).join('');
+  app.innerHTML = frame('Triage', `Message ${PH.i + 1} of ${PH.q.length}`, `
+    <div class="prog" aria-hidden="true">${bar}</div>
+    <div class="msg">
+      <div class="msg-h"><span class="av" aria-hidden="true">${m.av}</span><div><b>${m.from}</b>${PH.insp && m.addr ? `<br><span class="muted" style="font-size:.88rem">${m.addr}</span>` : ''}</div><span class="ch">${m.ch}</span></div>
+      <div class="msg-b">
+        <p>${m.body}</p>
+        ${m.qr ? qrSvg() : ''}
+        ${m.link ? `<p><span class="fakelink">${m.link.t}</span></p>` : ''}
+        <div id="inspbox"></div>
+      </div>
+    </div>
+    <div class="row" id="acts">
+      <button class="btn ghost" id="insp">Inspect details</button>
+      <button class="btn" data-v="legit">Looks legit</button>
+      <button class="btn" data-v="phish">Report as a scam</button>
+    </div>
+    <div id="phfb" aria-live="polite"></div>`);
+  $('#insp').addEventListener('click', () => { PH.insp = !PH.insp; showInsp(m); $('#insp').textContent = PH.insp ? 'Hide details' : 'Inspect details'; });
+  app.querySelectorAll('[data-v]').forEach(b => b.addEventListener('click', () => phAnswer(m, b.dataset.v === 'phish')));
+  if (PH.insp) { showInsp(m); $('#insp').textContent = 'Hide details'; }
+}
+function showInsp(m){
+  $('#inspbox').innerHTML = PH.insp ? `<div class="insp"><h3>What the details show</h3><ul class="tips">${m.insp.map(x => `<li>${x}</li>`).join('')}</ul></div>` : '';
+}
+function phAnswer(m, saidPhish){
+  const ok = saidPhish === m.phish;
+  PH.res[PH.i] = ok; if (ok) PH.ok++;
+  PH.insp = true; showInsp(m);
+  $('#acts').style.display = 'none';
+  const last = PH.i === PH.q.length - 1;
+  let head, kind;
+  if (ok) { head = m.phish ? 'Good catch. That was a scam.' : 'Correct. That one was real.'; kind = 'good'; }
+  else if (m.phish) { head = 'That was a scam.'; kind = 'bad'; }
+  else { head = 'That one was real.'; kind = 'meh'; }
+  const extra = !ok && m.phish ? 'If you had clicked, the attacker would likely have taken over an account and used it to scam your friends.' :
+                !ok ? 'Healthy caution is good, but reporting real messages means you may ignore real warnings later. Confirm through the official app or site instead.' : '';
+  $('#phfb').innerHTML = `<div class="fb ${kind}"><strong>${head}</strong><p>${m.why}</p>${extra ? `<p>${extra}</p>` : ''}<p><b>${m.phish ? 'Clues you could spot:' : 'Why it was safe:'}</b></p><ul class="tips">${m.clues.map(c => `<li>${c}</li>`).join('')}</ul></div><div class="row"><button class="btn" id="phn">${last ? 'See results' : 'Next message'}</button></div>`;
+  $('#phn').addEventListener('click', () => { if (last) phEnd(); else { PH.i++; PH.insp = false; window.scrollTo(0,0); phShow(); } });
+  $('#phn').focus();
+}
+function phEnd(){
+  app.innerHTML = frame('Triage', 'Results', `
+    <div class="card"><h2>You got ${PH.ok} of ${PH.q.length} right.</h2>
+    <p>Before you act on any message, run four checks:</p>
+    <ul class="tips">
+      <li><b>Who</b> is it really from? Look at the actual address or account, not just the display name.</li>
+      <li><b>What</b> are they asking for? A password, a code, money or a login should make you stop.</li>
+      <li><b>How</b> are they pushing you? Deadlines, threats and prizes are pressure tactics.</li>
+      <li><b>Where</b> does the link really go? Skip the link and open the app or site yourself.</li>
+    </ul></div>
+    <div class="row"><button class="btn" id="phgo">Next: when it gets serious</button></div>`);
+  $('#phgo').addEventListener('click', () => { window.scrollTo(0,0); phSerious(); });
+}
+function phSerious(){
+  app.innerHTML = frame('Triage', 'One more thing', `
+    <div class="card">
+      <h2>When a message turns into pressure</h2>
+      <p>Some scams do not want your password. They want you scared. A stranger, or someone pretending to be your age, might move you to a private chat, ask for photos or personal details, then threaten to share them or post them if you do not pay or send more.</p>
+      <p><b>If this ever happens to you or a friend:</b></p>
+      <ul class="tips">
+        <li>Stop replying. Do not pay and do not send more. It rarely ends the demands.</li>
+        <li>Keep the evidence. Take screenshots and save usernames and links.</li>
+        <li>Tell a trusted adult, a teacher or a school counselor. You are not in trouble.</li>
+        <li>Report the account on the platform and block it.</li>
+        <li>For images, tools like Take It Down (takeitdown.ncmec.org) can help remove them, and NeedHelpNow.ca offers support.</li>
+      </ul>
+      <div class="fb good"><strong>It is not your fault.</strong><p>The person doing the threatening is the one breaking the rules. Getting help early makes things easier to fix.</p></div>
+    </div>
+    <div class="row"><button class="btn" id="phdone">Close the case</button></div>`);
+  $('#phdone').addEventListener('click', () => {
+    app.innerHTML = frame('Triage', '', closed('ph', 'Triage', 100, [`You identified ${PH.ok} of ${PH.q.length} messages correctly.`, 'Check who, what, how and where before you click anything.', 'Never read a login code out to anyone. It is the key to your account.', 'If someone is pressuring or threatening you, save the evidence and tell a trusted adult.']));
+  });
+}
+
+/* =====================================================
+   CASE 3: ACCESS CONTROL
+   ===================================================== */
+const LEVELS = ['View only','Post and comment','Moderate','Admin'];
+const BLAST = [
+  'read private messages',
+  'spam every channel and post scam links as a trusted member',
+  'delete messages, mute people and ban members',
+  'delete the whole server, change every setting and remove you as owner'
+];
+const PEOPLE = [
+  {n:'Maya', job:'community volunteer who removes spam and cleans up arguments', need:2},
+  {n:'Leo', job:'new member who joined yesterday and wants to chat', need:1},
+  {n:'MusicBot', job:'bot that plays music in the voice channel', need:1},
+  {n:'Ms. Rivera', job:'club teacher who wants to read announcements but not chat', need:0},
+  {n:'Priya', job:'co-founder who helps run the server and edits roles', need:3},
+  {n:'Sam', job:'your best friend, who joked "make me admin lol"', need:1}
+];
+VIEWS.ac = () => acRoles();
+function acRoles(res){
+  const pick = acRoles.pick || (acRoles.pick = PEOPLE.map(() => 1));
+  app.innerHTML = frame('Access control', 'Step 1 of 3: set up the Gamerly fan server', `
+    <p>You own the server. Give each person the lowest role that still lets them do their job. Roles stack up like this: view only, post and comment, moderate, admin.</p>
+    <div class="card">
+      ${PEOPLE.map((p,i) => `<div class="person"><div><b>${p.n}</b> <span class="muted">${p.job}</span></div><div class="lv" role="group" aria-label="${p.n} role">${LEVELS.map((l,k) => `<button data-i="${i}" data-k="${k}" aria-pressed="${pick[i] === k}">${l}</button>`).join('')}</div>${res ? acNote(p, pick[i]) : ''}</div>`).join('')}
+    </div>
+    <div class="row"><button class="btn" id="lock">Lock in roles</button>${res ? '<button class="btn ghost" id="cont">Continue</button>' : ''}</div>
+    ${res ? `<div class="fb ${res.bad === 0 ? 'good' : 'meh'}" aria-live="polite"><strong>${res.right} of ${PEOPLE.length} roles fit.</strong><p>${res.bad === 0 ? 'Every person has exactly what they need. If any account got phished, the damage stays small.' : 'Adjust the roles and lock them in again, or continue. The notes above show what could go wrong.'}</p></div>` : ''}`);
+  app.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => { pick[+b.dataset.i] = +b.dataset.k; acRoles(null); }));
+  $('#lock').addEventListener('click', () => {
+    let right = 0, bad = 0; PEOPLE.forEach((p,i) => { if (pick[i] === p.need) right++; else bad++; });
+    acRoles({right, bad});
+  });
+  if (res) $('#cont').addEventListener('click', () => { window.scrollTo(0,0); acShare(); });
+}
+function acNote(p, got){
+  if (got === p.need) return `<div class="fb good" style="margin:0"><strong>Right fit.</strong><p>${p.n} can do their job and nothing extra.</p></div>`;
+  if (got > p.need) return `<div class="fb bad" style="margin:0"><strong>Too much access.</strong><p>If ${p.n}'s account were phished or hacked, the attacker could ${BLAST[got]}. ${p.n} only needs to ${BLAST[p.need]}${p.need === 3 ? '' : ' at most'}.</p></div>`;
+  return `<div class="fb meh" style="margin:0"><strong>Too little access.</strong><p>${p.n} could not do their job with this role. Least privilege means enough access, not zero.</p></div>`;
+}
+function acShare(){
+  app.innerHTML = frame('Access control', 'Step 2 of 3: sharing files', '<p>Sharing settings are permissions too. Pick the setting that fits each situation.</p><div id="qz"></div>');
+  runQuiz($('#qz'), [
+    {q:'You and three classmates are writing a group project together. How do you share the doc?', o:['Anyone with the link can edit','Add each classmate by name or email as an editor','Anyone with the link can view','Share it with the whole school'], a:1, why:'Named editors only. A link can be forwarded or posted by accident, and then strangers could change or delete your work.'},
+    {q:'You made a bake sale flyer and want the whole school to see it. What setting?', o:['Anyone with the link can view','Anyone with the link can edit','Only you','Named editors only'], a:0, why:'The flyer is meant to be public, so open viewing is fine. The key part is view only, so nobody can change the details or the price.'},
+    {q:'Your teacher wants to give feedback on your essay draft. What do you share?', o:['Edit access for the whole class','Anyone with the link can edit','Your teacher only, with comment access','Make a copy on a public site'], a:2, why:'Comment access lets your teacher give feedback without rewriting your work, and only one person can see it.'},
+    {q:'The group project ended two months ago. What should you do with the shared folder?', o:['Leave it alone, it is not hurting anyone','Remove people who no longer need access','Give everyone edit access so it is fair','Delete your own account'], a:1, why:'Access should be reviewed regularly. Old shares are a classic leak, because people forget they exist while the access quietly stays open.'}
+  ], () => { window.scrollTo(0,0); acApps(); });
+}
+const APPS = [
+  {n:'Super Flashlight', perms:[['Camera (to use the flash)',true,'Phone flashlights run through the camera flash.'],['Contacts',false,'A flashlight has no reason to read your friends\' details.'],['Location',false,'It does not need to know where you are.'],['Microphone',false,'There is nothing to record in a flashlight.']]},
+  {n:'Photo Filters', perms:[['Photos',true,'It has to read the photos you want to edit.'],['Contacts',false,'Editing a photo does not require your contact list.'],['Location',false,'Not needed to apply a filter, and it could reveal where you live.']]},
+  {n:'City Maps', perms:[['Location (while using the app)',true,'Directions need to know where you are while you navigate.'],['Contacts',false,'Maps can work without your address book.'],['Camera',false,'Not needed to show a route.']]},
+  {n:'Video Chat', perms:[['Camera',true,'You cannot video chat without it.'],['Microphone',true,'You cannot talk without it.'],['Contacts',false,'You can type usernames in. Handing over your whole contact list is not required.'],['Location',false,'Video calls do not need to know where you are.']]}
+];
+function acApps(res){
+  const ch = acApps.ch || (acApps.ch = {});
+  app.innerHTML = frame('Access control', 'Step 3 of 3: app permissions', `
+    <p>Each app is asking for permissions. Allow only what it needs to do its job.</p>
+    <div class="apps">${APPS.map((a,ai) => `<div class="card"><h3>${a.n}</h3>${a.perms.map((p,pi) => {
+      const key = ai + '-' + pi; const v = ch[key]; const r = res;
+      const right = r && ((v === 'allow') === p[1]);
+      return `<div class="perm"><div>${p[0]}${r ? `<br><span class="${right ? '' : 'muted'}" style="font-size:.88rem">${right ? 'Good. ' : (p[1] ? 'You blocked something it needs. ' : 'Not needed. ')}${p[2]}</span>` : ''}</div><span class="sw" role="group" aria-label="${a.n} ${p[0]}"><button data-k="${key}" data-v="allow" aria-pressed="${v === 'allow'}">Allow</button><button data-k="${key}" data-v="deny" aria-pressed="${v === 'deny'}">Deny</button></span></div>`;
+    }).join('')}</div>`).join('')}</div>
+    <div class="row"><button class="btn" id="chk">Check my choices</button>${res ? '<button class="btn ghost" id="cont">Continue</button>' : ''}</div>`);
+  app.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { ch[b.dataset.k] = b.dataset.v; acApps(null); }));
+  $('#chk').addEventListener('click', () => { acApps(true); window.scrollTo(0, document.body.scrollHeight); });
+  if (res) $('#cont').addEventListener('click', () => { window.scrollTo(0,0); acFinal(); });
+}
+function acFinal(){
+  app.innerHTML = frame('Access control', 'Final check', '<div id="qz"></div>');
+  runQuiz($('#qz'), [
+    {q:'What does "principle of least privilege" mean?', o:['Everyone gets the same access','Each person or app gets only the access it needs, for as long as it needs it','Only administrators can do anything','Remove all access to be safe'], a:1, why:'Enough access to do the job, nothing extra. That limits the damage if a person makes a mistake or an account gets taken over.'},
+    {q:'A friend asks to borrow your streaming account password. What is a safer approach?', o:['Give it to them, they are your friend','Use a family or guest profile they can sign in to themselves, or have them make their own','Give it to them but change it later','Post it in the group chat'], a:1, why:'A password gives full access to everything, including settings and payment details. Separate profiles or accounts keep access limited and easy to remove.'},
+    {q:'Why shouldn\'t you use an admin account for everyday things?', o:['Admin accounts are slower','If it gets phished, the attacker gets full control instead of limited access','Admin accounts cannot browse the web','There is no reason'], a:1, why:'Daily accounts should have everyday permissions. Keep the powerful account for the rare moments you truly need it.'}
+  ], (s,t) => {
+    app.innerHTML = frame('Access control', '', closed('ac', 'Access control', 100, [`You scored ${s} of ${t} on the final check.`, 'Give people, apps and sharing links the least access that still works.', 'Be suspicious of any request for more access than the task needs.', 'Review who and what has access every so often, and remove what is no longer needed.']));
+  });
+}
+
+/* =====================================================
+   CASE 4: BUG BOUNTY JR.
+   ===================================================== */
+const FINDS = [
+  {id:'hint', t:'Login hint: "New staff: username admin, password admin"', note:'A default login, shown in public. You spotted it by reading the page.', why:'Default passwords are a classic weakness. A real researcher would note it, but would not try it. Logging in without permission is unauthorized access.'},
+  {id:'list', t:'Public link: "beta-testers.html (remove before launch)"', note:'A page listing tester emails, reachable without a login.', why:'Personal data exposed to anyone is a serious issue. You may note that it exists, but you would not collect or share the data.'},
+  {id:'note', t:'Team photo with a sticky note on the monitor', note:'A password written on a note is visible in the photo.', why:'Secrets leak through photos all the time. This is a human-habit problem, and it is worth reporting, not using.'},
+  {id:'ver', t:'Footer: "Powered by ForumKit 2.1 (2016)"', note:'Old software that likely has known bugs.', why:'Outdated software is a risk because known flaws get public. Noting the version is fine. Poking at it is not.'}
+];
+const BB = {found:{}};
+VIEWS.bb = () => { BB.found = {}; bbObserve(); };
+function bbObserve(){
+  const n = Object.keys(BB.found).length;
+  app.innerHTML = frame('Bug Bounty Jr.', 'Step 1 of 4: observe the practice target', `
+    <div class="notice">This is a made-up website for practice. Real researchers only test systems they have permission to test. For now, you are just a visitor reading a public page. Click anything that looks like a weak point.</div>
+    <div class="portal">
+      <div class="bar">https://beta.gamerly.example</div>
+      <div class="body">
+        <h2 style="margin:0">Gamerly beta portal</h2>
+        ${spot('hint', '<b>Staff login</b><br>Username <em>________</em> Password <em>________</em><br><small>New staff: username <b>admin</b>, password <b>admin</b></small>')}
+        ${spot('list', '<b>Quick links:</b> Home &middot; Patch notes &middot; <u>beta-testers.html</u> (remove before launch)')}
+        ${spot('note', '<b>Meet the team</b><br><small>Photo: our QA lead at work</small><br><span class="sticky">wifi + login: Gam3rly2019</span>')}
+        ${spot('ver', '<small>Powered by ForumKit 2.1 (2016) &middot; &copy; Gamerly</small>')}
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px" aria-live="polite">
+      <h3>Your findings: ${n} of ${FINDS.length}</h3>
+      ${n === 0 ? '<p class="muted">Nothing logged yet.</p>' : `<ul class="log tips">${FINDS.filter(f => BB.found[f.id]).map(f => `<li><b>${f.t}</b><br>${f.why}</li>`).join('')}</ul>`}
+    </div>
+    <div class="row"><button class="btn" id="bbn" ${n < 3 ? 'disabled' : ''}>Next: what do you do with this?</button>${n < 3 ? '<span class="muted">Find at least 3 to continue.</span>' : ''}</div>`);
+  app.querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', () => { BB.found[b.dataset.f] = true; bbObserve(); }));
+  $('#bbn').addEventListener('click', () => { window.scrollTo(0,0); bbTree('n1'); });
+}
+function spot(id, html){
+  const f = BB.found[id];
+  return `<button class="hot ${f ? 'found' : ''}" data-f="${id}" aria-label="${f ? 'Found issue' : 'Inspect this part of the page'}">${html}${f ? '<br><b style="color:#0B7A55">Logged as a finding</b>' : ''}</button>`;
+}
+const TREE = {
+  n1:{p:'While browsing the Gamerly beta site as an ordinary visitor, you notice a public page listing 200 testers\' email addresses. No login needed. What do you do first?',
+    o:[
+      {t:'Use the admin/admin hint to see how much more you can get into', k:'bad', r:'That crosses the line. You only had permission to look at public pages, not to test their systems. Unauthorized access can be a crime even when your intentions are good, and it could get you in real trouble.'},
+      {t:'Post a screenshot so everyone knows the site is unsafe', k:'bad', r:'This exposes 200 people to spam and scams before the problem is fixed, and it puts you at risk too. Responsible researchers keep details private until the owner can fix them.'},
+      {t:'Write down what you saw, touch nothing else and look for a way to contact the company', k:'good', r:'This is the researcher mindset. You noted the problem without exploring any further, and you are looking for the right channel.', n:'n2'},
+      {t:'Tell a parent or teacher what you found and ask for help reporting it', k:'good', r:'A smart move, especially at your age. A trusted adult can help you report it properly and protect you.', n:'n2'}
+    ]},
+  n2:{p:'There is no security page. Only a general support form. What do you send?',
+    o:[
+      {t:'A short, polite note: what you noticed, where, and that you did not go any further', k:'good', r:'Clear and calm. Describe where the problem is without including the actual emails or screenshots of the list.', n:'n3'},
+      {t:'A message saying they have to pay you or you will tell everyone', k:'bad', r:'That is extortion. Even if the bug is real, demanding money for silence is a crime and ends any chance of being thanked.'},
+      {t:'Nothing. Somebody else will report it.', k:'meh', r:'Everyone assumes this, so nobody reports. The data stays exposed. A short note is worth sending.'}
+    ]},
+  n3:{p:'Two weeks later there is no reply, and the page is still live. What now?',
+    o:[
+      {t:'Publish the full details so they are forced to fix it', k:'bad', r:'Publishing before a fix helps attackers more than defenders. It also hurts the 200 people on the list.'},
+      {t:'Follow up politely, and ask your trusted adult to help find another channel, such as the hosting provider or a national cyber agency', k:'good', r:'Patience and persistence, through proper routes. This is how coordinated disclosure works.', n:'end'},
+      {t:'Try the admin login after all, since they ignored you', k:'bad', r:'Being ignored does not give you permission. It is still unauthorized access.'}
+    ]}
+};
+function bbTree(key, fb){
+  if (key === 'end'){ bbCipher(); return; }
+  const node = TREE[key];
+  app.innerHTML = frame('Bug Bounty Jr.', 'Step 2 of 4: what would you do?', `
+    <div class="card"><h2 style="font-size:1.2rem">${node.p}</h2>
+      <div class="opts">${node.o.map((o,i) => `<button class="opt ${fb && fb.i === i ? (o.k === 'good' ? 'right' : 'wrong') : ''}" data-i="${i}" ${fb ? 'disabled' : ''}>${o.t}</button>`).join('')}</div>
+      <div aria-live="polite">${fb ? `<div class="fb ${fb.o.k === 'good' ? 'good' : fb.o.k === 'bad' ? 'bad' : 'meh'}"><strong>${fb.o.k === 'good' ? 'Good call.' : fb.o.k === 'bad' ? 'Not that.' : 'Not great.'}</strong><p>${fb.o.r}</p></div><div class="row">${fb.o.n ? '<button class="btn" id="tnext">Continue</button>' : '<button class="btn" id="tback">Try a different choice</button>'}</div>` : ''}</div>
+    </div>`);
+  app.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => bbTree(key, {i:+b.dataset.i, o:node.o[+b.dataset.i]})));
+  if (fb){ const nx = $('#tnext'), bk = $('#tback'); if (nx) { nx.addEventListener('click', () => { window.scrollTo(0,0); bbTree(fb.o.n); }); nx.focus(); } if (bk) { bk.addEventListener('click', () => bbTree(key)); bk.focus(); } }
+}
+function bbCipher(){
+  const plain = 'ALWAYS GET PERMISSION FIRST', key = 7;
+  const enc = s => s.replace(/[A-Z]/g, c => String.fromCharCode((c.charCodeAt(0) - 65 + key) % 26 + 65));
+  const dec = (s, k) => s.replace(/[A-Z]/g, c => String.fromCharCode(((c.charCodeAt(0) - 65 - k) % 26 + 26) % 26 + 65));
+  const ct = enc(plain);
+  app.innerHTML = frame('Bug Bounty Jr.', 'Step 3 of 4: crack a safe puzzle', `
+    <p>Puzzles like this are how many people first get hooked on security. This one is a Caesar cipher: every letter was shifted forward in the alphabet by the same secret amount. Slide the shift until the message makes sense.</p>
+    <div class="card">
+      <p class="muted" style="margin-bottom:2px">Scrambled message</p><div class="cipher" aria-label="Scrambled message">${ct}</div>
+      <label for="sh">Shift back by: <b id="shv">0</b></label>
+      <input id="sh" type="range" min="0" max="25" value="0">
+      <p class="muted" style="margin:10px 0 2px">Result</p><div class="cipher" id="out" aria-live="polite">${ct}</div>
+      <div class="row"><button class="btn" id="chk">This is the message</button></div>
+      <div id="cfb" aria-live="polite"></div>
+    </div>
+    <p class="muted" style="font-size:.9rem">Caesar ciphers are a toy. They teach the idea of a secret key, but anyone can crack one in seconds. Real encryption uses far bigger keys.</p>`);
+  const sh = $('#sh');
+  sh.addEventListener('input', () => { $('#shv').textContent = sh.value; $('#out').textContent = dec(ct, +sh.value); });
+  $('#chk').addEventListener('click', () => {
+    if (+sh.value === key) {
+      $('#cfb').innerHTML = `<div class="fb good"><strong>Cracked.</strong><p>The message was the first rule of the job: always get permission first. Skill is only half of being a security researcher. The rules are the other half.</p></div><div class="row"><button class="btn" id="cn">Continue</button></div>`;
+      $('#cn').addEventListener('click', () => { window.scrollTo(0,0); bbFinal(); }); $('#cn').focus();
+    } else $('#cfb').innerHTML = '<div class="fb meh"><strong>Not readable yet.</strong><p>Keep sliding until you see real words.</p></div>';
+  });
+}
+function bbFinal(){
+  app.innerHTML = frame('Bug Bounty Jr.', 'Step 4 of 4: the code and your next steps', `
+    <div class="card" style="margin-bottom:16px">
+      <h2>The researcher\'s code</h2>
+      <ul class="tips">
+        <li><b>Permission first.</b> Only test what you own or what the owner has explicitly allowed.</li>
+        <li><b>Stay in scope.</b> Programs list exactly what you may test. Anything else is off limits.</li>
+        <li><b>Do no harm.</b> Do not copy data, break things or poke around "just to see".</li>
+        <li><b>Report privately.</b> Tell the owner, not the internet.</li>
+        <li><b>Be patient.</b> Give them time to fix it before you say anything publicly.</li>
+      </ul>
+      <h3>Where to practice legally</h3>
+      <ul class="tips">
+        <li>Capture-the-flag (CTF) competitions, such as picoCTF, built for students.</li>
+        <li>Practice sites made to be attacked, with rules you can read.</li>
+        <li>Company bug bounty programs, once you are old enough. Many have age limits.</li>
+      </ul>
+      <p class="muted" style="font-size:.9rem">Check with a parent or teacher before signing up for anything.</p>
+    </div>
+    <div id="qz"></div>`);
+  runQuiz($('#qz'), [
+    {q:'A company\'s bug bounty page lists three websites that are in scope. You find a flaw on a fourth. What do you do?', o:['Test it anyway, a bug is a bug','Stay out of it and consider telling the company about what you noticed passively','Sell it','Post about it'], a:1, why:'Scope is the boundary of your permission. Outside it, you have no authorization, even if you mean well.'},
+    {q:'Is it legal to test a website\'s security without permission if your intentions are good?', o:['Yes, if you tell them after','Yes, if you do not break anything','No. Good intentions do not equal permission, and it can be a crime','Only on weekends'], a:2, why:'Authorization is what separates a researcher from an intruder. Without it, even harmless probing can break the law.'},
+    {q:'What is the main difference between a "white hat" and a "black hat"?', o:['The tools they use','Permission and intent: white hats are authorized and help fix problems','White hats are paid, black hats are not','There is no difference'], a:1, why:'The skills can be identical. What differs is whether the person has permission and whether they use the knowledge to help or to harm.'}
+  ], (s,t) => {
+    app.innerHTML = frame('Bug Bounty Jr.', '', closed('bb', 'Bug Bounty Jr.', 100, [`You scored ${s} of ${t} on the final check.`, 'Noticing a flaw is different from exploiting one. Observing public things is fine, testing without permission is not.', 'Report privately to the owner, with help from a trusted adult if needed.', 'Real skills can be practiced legally through CTFs and practice sites.']));
+  });
+}
+
+/* =====================================================
+   CAPSTONE: THE GAMERLY INCIDENT
+   ===================================================== */
+const INC = [
+  {title:'Alex reused a password', story:'Alex, a Gamerly intern, used the same password for the company email and a fan forum. The forum was breached and the password leaked.',
+   fixes:['Make everyone change their password every week','Require a unique password for every account (with a password manager) and two-factor authentication','Block the forum on work computers'], a:1,
+   why:'Unique passwords stop one breach from spreading, and two-factor means a stolen password alone is not enough. Forced weekly changes tend to produce weaker, predictable passwords.'},
+  {title:'A fake refund email', story:'An attacker emailed the support team a "refund tool" link. Sam clicked it and typed in the company login.',
+   fixes:['Fire Sam so people are afraid to click','Train staff to spot and report phishing, with an easy report button, and use two-factor so a stolen login is not enough','Ban all links in email'], a:1,
+   why:'Everyone gets fooled eventually. Good defenses assume mistakes will happen: make reporting easy and add a second lock. Punishing people makes them hide mistakes.'},
+  {title:'Sam could see everything', story:'Sam\'s support account could read all player data, change billing and delete accounts, so the attacker could too.',
+   fixes:['Give every employee the same access so it is fair','Give support only the access needed for the ticket they are working on, with extra rights granted temporarily when approved','Trust Sam more after training'], a:1,
+   why:'This is least privilege. If the account had been limited, the attacker would have gotten very little.'},
+  {title:'The warning nobody read', story:'Two weeks earlier, a researcher emailed Gamerly about an exposed test page. Nobody checked that inbox.',
+   fixes:['Delete the inbox','Publish a security contact page, assign someone to respond and thank people who report problems','Threaten legal action against researchers'], a:1,
+   why:'Responsible researchers want to help. Making it easy to report, and responding quickly, turns outsiders into allies and catches problems before attackers do.'}
+];
+const CAP = {};
+VIEWS.cap = () => { CAP.fixed = {}; capShow(); };
+function capShow(){
+  const nfix = Object.keys(CAP.fixed).length;
+  app.innerHTML = frame('The Gamerly incident', 'An attacker got into player accounts last night. Review the timeline and fix each weak link.', `
+    <div class="tl">
+      ${INC.map((e,i) => `<div class="ev ${CAP.fixed[i] ? 'fixed' : ''}"><h3>${e.title}</h3><p>${e.story}</p>
+        ${CAP.fixed[i] ? `<div class="fb good"><strong>Fixed.</strong><p>${e.why}</p></div>` : `<div class="opts">${e.fixes.map((f,k) => `<button class="opt" data-e="${i}" data-k="${k}">${f}</button>`).join('')}</div><div id="ef${i}" aria-live="polite"></div>`}</div>`).join('')}
+    </div>
+    ${nfix === INC.length ? `<div id="capend"></div>` : `<p class="muted">${nfix} of ${INC.length} links fixed.</p>`}`);
+  app.querySelectorAll('[data-e]').forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.e, k = +b.dataset.k, e = INC[i];
+    if (k === e.a) { CAP.fixed[i] = true; capShow(); }
+    else $('#ef' + i).innerHTML = '<div class="fb bad"><strong>That would not hold.</strong><p>Think about what would stop this link from repeating, without causing new problems. Try another option.</p></div>';
+  }));
+  if (nfix === INC.length) {
+    $('#capend').innerHTML = closed('cap', 'The Gamerly incident', 150, ['Real breaches are rarely one mistake. A reused password, a phishing click and loose permissions can chain together.', 'Strong, unique passwords with two-factor, careful reading of messages, least privilege and a welcome mat for researchers each break a link in that chain.', 'You finished every case file. You are ready for the job.']);
+  }
+}
+
+/* =====================================================
+   FOR PARENTS AND TEACHERS
+   ===================================================== */
+VIEWS.grown = () => {
+  app.innerHTML = frame('For parents and teachers', '', `
+    <div class="card" style="margin-bottom:14px">
+      <h2>What this is</h2>
+      <p>Night Shift is a self-paced introduction to everyday cybersecurity for ages 12 to 16. Four short case files and a closing incident teach habits that protect accounts and people. It runs entirely in the browser, collects no data, and has no accounts. Progress is saved only on the device being used.</p>
+      <p>Plan on 8 to 10 minutes per case, or about 50 minutes for everything. In a classroom, pairs working through a case and discussing each choice tend to work well.</p>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h2>Key takeaways</h2>
+      <ul class="tips">
+        <li><b>Passwords:</b> use long passwords or passphrases, a different one for every account, a password manager, and two-factor authentication, starting with email.</li>
+        <li><b>Phishing:</b> check who sent it, what it asks for, how it pressures, and where the link really goes. Never share login codes.</li>
+        <li><b>Least privilege:</b> give people, apps and sharing links only the access they need, and review it regularly.</li>
+        <li><b>Ethical hacking:</b> permission and scope define the difference between research and intrusion. Report privately and practice legally.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h2>Conversation starters</h2>
+      <ul class="tips">
+        <li>Which accounts would be the worst to lose, and how are they protected?</li>
+        <li>Have you or a friend ever received a message that felt off? What gave it away?</li>
+        <li>Who has access to your shared documents or your server, and do they still need it?</li>
+        <li>If you found a flaw in a school or game website, who would you tell?</li>
+        <li>If someone online ever pressured you or threatened you, who is the first adult you would go to? Make clear that they will not be in trouble.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h2>About the content</h2>
+      <p>The password estimator is deliberately simplified. Phishing examples use made-up domains. The ethical hacking case teaches mindset, legal boundaries and responsible reporting. It contains no instructions for attacking real systems. The only hands-on puzzle is a Caesar cipher.</p>
+    </div>
+    <div class="row noprint"><button class="btn" data-act="print">Print this page</button><button class="btn ghost" data-act="home">Back to cases</button></div>`);
+};
+
+/* ---------- boot ---------- */
+renderRank();
+go('hub');
+})();
+</script>
+</body>
+</html>
