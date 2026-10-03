@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hash Hunt: guess the password</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#F2F3FB; --surface:#FFFFFF; --surface2:#E6E8F6; --text:#161A3A; --muted:#4F5586; --line:#C9CEEA;
+  --accent:#FFB547; --accent-ink:#2A1B00; --accent-text:#8A4F00;
+  --safe:#0B7A55; --safe-bg:#DDF5EC; --danger:#BE2237; --danger-bg:#FBE3E6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#12152B; --surface:#1B2040; --surface2:#262C57; --text:#ECEBFA; --muted:#A5AAD3; --line:#363E70;
+    --accent-text:#FFC36B; --safe:#5BE3B0; --safe-bg:#12392F; --danger:#FF7081; --danger-bg:#41202C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#12152B; --surface:#1B2040; --surface2:#262C57; --text:#ECEBFA; --muted:#A5AAD3; --line:#363E70;
+  --accent-text:#FFC36B; --safe:#5BE3B0; --safe-bg:#12392F; --danger:#FF7081; --danger-bg:#41202C;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:'Bricolage Grotesque','Figtree',system-ui,sans-serif;line-height:1.1;margin:0 0 .5em;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800}
+h2{font-size:1.3rem;font-weight:700}
+p{margin:0 0 1em;max-width:62ch}
+.wrap{max-width:720px;margin:0 auto;padding:28px 20px 60px}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:12px 20px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text]{width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.15rem;padding:13px 14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--text)}
+.hash{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all;background:var(--surface2);border-radius:10px;padding:10px 12px;margin:6px 0 0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.counter{display:flex;align-items:baseline;gap:12px}
+.counter .n{font-family:'Bricolage Grotesque',sans-serif;font-size:4rem;font-weight:800;line-height:1;color:var(--accent-text)}
+.counter .l{color:var(--muted)}
+.fb{border-radius:10px;padding:12px 14px;margin-top:14px;border-left:5px solid}
+.fb.bad{background:var(--danger-bg);border-color:var(--danger)}
+.fb.good{background:var(--safe-bg);border-color:var(--safe)}
+.fb p:last-child{margin-bottom:0}
+ol.hist{margin:0;padding-left:1.6em;max-height:240px;overflow-y:auto}
+ol.hist li{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95rem;padding:2px 0;word-break:break-all}
+.hint{border-top:1px solid var(--line);padding:8px 0}
+.hint:first-of-type{border-top:0}
+.win h2{color:var(--safe)}
+details summary{cursor:pointer;font-weight:600}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Hash Hunt</h1>
+  <p class="muted">The vault below never stores the password itself, only its hash: a one-way scramble. Your job is to figure out the password. Every guess is counted.</p>
+
+  <section class="card" aria-labelledby="storedh">
+    <h2 id="storedh">What the vault stores</h2>
+    <p class="muted" style="margin-bottom:0">SHA-256 hash of the secret password:</p>
+    <div class="hash" id="target"></div>
+  </section>
+
+  <section class="card" id="play" aria-labelledby="guessh">
+    <h2 id="guessh">Make a guess</h2>
+    <form id="f" autocomplete="off">
+      <label for="g">Password guess</label>
+      <input id="g" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type a guess and press Enter">
+      <div class="row">
+        <button class="btn" type="submit" id="go">Submit guess</button>
+        <button class="btn ghost" type="button" id="reset">Start over</button>
+      </div>
+    </form>
+    <div id="result" aria-live="polite"></div>
+  </section>
+
+  <section class="card" aria-labelledby="stath">
+    <h2 id="stath">Your attempts</h2>
+    <div class="counter"><span class="n" id="count">0</span><span class="l">guesses so far</span></div>
+    <p class="muted" id="timer" style="margin:10px 0 0"></p>
+  </section>
+
+  <section class="card" aria-labelledby="hinth">
+    <h2 id="hinth">Hints</h2>
+    <div id="hints"></div>
+  </section>
+
+  <section class="card" aria-labelledby="histh">
+    <h2 id="histh">Guess history</h2>
+    <p class="muted" id="emptyhist" style="margin:0">No guesses yet.</p>
+    <ol class="hist" id="hist" reversed></ol>
+  </section>
+
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ----- Configuration: edit these to change the challenge ----- */
+// SHA-256 of the secret password. Stored in plain sight; that is the point.
+const TARGET_HASH = 'ca9a2a82ade536456a8c18ecc49a872eaefd35be3c4f8f35b082c696d9e911bc';
+// Hints unlock after this many wrong guesses.
+const HINTS = [
+  {after:5,  text:'The password is two words joined by a hyphen.'},
+  {after:10, text:'The first word is a colour.'},
+  {after:15, text:'The second word is something with two wheels.'}
+];
+
+/* ----- SHA-256 (uses the browser's built-in version, with a fallback) ----- */
+function sha256Fallback(str){
+  const K = [], H = [];
+  (function(){ let n = 2, c = 0;
+    while (c < 64){ let p = true; for (let i = 2; i*i <= n; i++) if (n % i === 0){ p = false; break; }
+      if (p){ if (c < 8) H[c] = (Math.pow(n, .5) % 1 * 4294967296) | 0; K[c] = (Math.pow(n, 1/3) % 1 * 4294967296) | 0; c++; } n++; } })();
+  const bytes = new TextEncoder().encode(str), len = bytes.length;
+  const buf = new Uint8Array(((len + 9 + 63) >> 6) << 6); buf.set(bytes); buf[len] = 0x80;
+  const dv = new DataView(buf.buffer);
+  dv.setUint32(buf.length - 4, (len * 8) >>> 0); dv.setUint32(buf.length - 8, Math.floor(len * 8 / 4294967296));
+  const h = H.slice(), w = new Array(64);
+  for (let o = 0; o < buf.length; o += 64){
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i*4);
+    for (let i = 16; i < 64; i++){
+      const a = w[i-15], b = w[i-2];
+      const s0 = ((a>>>7)|(a<<25)) ^ ((a>>>18)|(a<<14)) ^ (a>>>3);
+      const s1 = ((b>>>17)|(b<<15)) ^ ((b>>>19)|(b<<13)) ^ (b>>>10);
+      w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+    }
+    let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], k = h[7];
+    for (let i = 0; i < 64; i++){
+      const S1 = ((e>>>6)|(e<<26)) ^ ((e>>>11)|(e<<21)) ^ ((e>>>25)|(e<<7));
+      const t1 = (k + S1 + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const S0 = ((a>>>2)|(a<<30)) ^ ((a>>>13)|(a<<19)) ^ ((a>>>22)|(a<<10));
+      const t2 = (S0 + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      k = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h[0] = (h[0]+a)|0; h[1] = (h[1]+b)|0; h[2] = (h[2]+c)|0; h[3] = (h[3]+d)|0;
+    h[4] = (h[4]+e)|0; h[5] = (h[5]+f)|0; h[6] = (h[6]+g)|0; h[7] = (h[7]+k)|0;
+  }
+  return h.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+async function sha256(str){
+  try {
+    if (window.crypto && crypto.subtle) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) {}
+  return sha256Fallback(str);
+}
+
+/* ----- Game state ----- */
+const $ = id => document.getElementById(id);
+let attempts = 0, startedAt = null, solved = false, tick = null;
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+$('target').textContent = TARGET_HASH;
+
+function fmtSecs(s){ const m = Math.floor(s/60); return m ? m + ' min ' + (s % 60) + ' s' : s + ' s'; }
+function renderTimer(){
+  if (!startedAt){ $('timer').textContent = 'The clock starts on your first guess.'; return; }
+  $('timer').textContent = 'Time on the hunt: ' + fmtSecs(Math.round((Date.now() - startedAt) / 1000));
+}
+function renderHints(){
+  $('hints').innerHTML = HINTS.map((h, i) => {
+    const open = attempts >= h.after;
+    const need = h.after - attempts;
+    return `<div class="hint"><b>Hint ${i + 1}:</b> ` + (open ? esc(h.text) : `<span class="muted">locked, unlocks after ${need} more wrong ${need === 1 ? 'guess' : 'guesses'}</span>`) + '</div>';
+  }).join('');
+}
+function renderCount(){ $('count').textContent = attempts; renderHints(); }
+
+$('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (solved) return;
+  const input = $('g'), guess = input.value;
+  if (!guess){ $('result').innerHTML = '<div class="fb bad"><strong>Nothing entered.</strong><p>Type a guess first. Empty guesses are not counted.</p></div>'; return; }
+  if (!startedAt){ startedAt = Date.now(); tick = setInterval(renderTimer, 1000); }
+  $('go').disabled = true;
+  const hash = await sha256(guess);
+  $('go').disabled = false;
+  attempts++;
+  const ok = hash === TARGET_HASH;
+  renderCount();
+  const li = document.createElement('li');
+  li.innerHTML = esc(guess) + ' <span class="muted">' + (ok ? '(correct)' : '(wrong)') + '</span>';
+  $('hist').prepend(li); $('emptyhist').style.display = 'none';
+  if (ok){
+    solved = true; clearInterval(tick); renderTimer();
+    const secs = Math.round((Date.now() - startedAt) / 1000);
+    $('result').innerHTML = `<div class="fb good win"><h2>Access granted.</h2><p>You found it in <b>${attempts}</b> ${attempts === 1 ? 'guess' : 'guesses'} and ${fmtSecs(secs)}.</p>
+      <p>Your guess hashed to exactly the stored value:</p><div class="hash">${hash}</div>
+      <p style="margin-top:12px"><b>Why this matters.</b> You needed ${attempts} tries. A real attacker with a stolen list of hashes can try billions of guesses per second, so a password you could guess with a few hints would fall instantly. Long, unrelated words and a unique password per account push the number of guesses past anything a computer can finish.</p></div>`;
+    input.disabled = true; $('go').disabled = true;
+  } else {
+    $('result').innerHTML = `<div class="fb bad"><strong>Wrong password.</strong><p>Your guess hashed to:</p><div class="hash">${hash}</div><p class="muted" style="margin-top:8px">Compare it with the stored hash above. Even a one-letter difference in a guess produces a completely different hash, so there is no way to tell you are "close".</p></div>`;
+    input.select();
+  }
+});
+
+$('reset').addEventListener('click', () => {
+  attempts = 0; startedAt = null; solved = false; clearInterval(tick);
+  $('g').value = ''; $('g').disabled = false; $('go').disabled = false;
+  $('result').innerHTML = ''; $('hist').innerHTML = ''; $('emptyhist').style.display = '';
+  renderCount(); renderTimer(); $('g').focus();
+});
+
+/* ----- Hash maker for whoever sets up the challenge ----- */
+$('mk').addEventListener('input', async e => {
+  const v = e.target.value;
+  $('mkout').textContent = v ? await sha256(v) : 'The hash appears here.';
+});
+
+renderCount(); renderTimer();
+})();
+</script>
+</body>
+</html>
