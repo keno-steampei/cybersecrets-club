@@ -304,6 +304,14 @@ VIEWS.hub = () => {
     <h1>Your first shift starts now.</h1>
     <p>Gamerly is a small game studio, and you just joined its security team. Work through four case files, then take on a real incident. Each one takes about ten minutes, and you can play them in any order.</p>
     <p class="muted" style="font-size:.95rem">Everything runs in your browser. Nothing you type is sent anywhere or saved except your progress, which stays on this device.</p>
+    <div style="display: flex">
+      <div>
+        <p>The dastardly cyber villain Cyber-Hacks has a series of scheme to break your security.</p>
+        <p>Thwart his plans by working through these case files to unlock and solve the incident!</p>
+      </div>
+      <div><img src="./cyberhack2.jpeg" style="width: 50%">
+    </div>
+</div>
   </section>
   <div class="cases">
     ${CASES.map(c => `<button class="case" data-act="go" data-v="${c.id}"><span class="ico">${ic(c.ico)}</span><span><strong>${c.name}</strong><span class="muted">${c.text}</span><span class="meta"><span class="tag ${S.done[c.id] ? 'good' : ''}">${S.done[c.id] ? 'Completed' : `About ${c.mins} min`}</span></span></span></button>`).join('')}
